@@ -1,0 +1,10 @@
+package com.mehmetbaloglu.mychatapp.models
+
+data class User(
+    val userId: String = "",  // Firebase UID
+    val email: String = "",
+    val username: String = "",
+    val profileImageUrl: String? = null,
+    val isOnline: Boolean = false,
+    val lastSeen: Long = 0
+)

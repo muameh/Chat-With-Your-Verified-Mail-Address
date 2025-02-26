@@ -1,0 +1,12 @@
+package com.mehmetbaloglu.mychatapp.ui.viewmodels
+
+import androidx.lifecycle.ViewModel
+import com.mehmetbaloglu.mychatapp.repository.Repository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
+@HiltViewModel
+class LogInViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
+
+
+}

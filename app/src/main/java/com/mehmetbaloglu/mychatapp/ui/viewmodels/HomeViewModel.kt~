@@ -1,0 +1,4 @@
+package com.mehmetbaloglu.mychatapp.ui.viewmodels
+
+class HomeViewModel {
+}

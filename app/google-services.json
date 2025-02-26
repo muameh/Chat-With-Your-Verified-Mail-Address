@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "425480859266",
+    "project_id": "mychatapp-dc23b",
+    "storage_bucket": "mychatapp-dc23b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:425480859266:android:f7c9caf493d21af5da8e9b",
+        "android_client_info": {
+          "package_name": "com.mehmetbaloglu.mychatapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6tpRQJ4oWsHZpYYWQiiCi1Dk5TFfcOU4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
