@@ -36,9 +36,7 @@ import com.mehmetbaloglu.mychatapp.navigation.AppScreens
 import com.mehmetbaloglu.mychatapp.ui.viewmodels.LogInViewModel
 
 @Composable
-fun LogInScreen(
-    navController: NavController = rememberNavController()
-) {
+fun LogInScreen(navController: NavController) {
     val logInViewModel: LogInViewModel = hiltViewModel()
     val logInState by logInViewModel.logInState.collectAsState()
     val context = LocalContext.current
@@ -48,18 +46,16 @@ fun LogInScreen(
     var formError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(logInState) {
-        Log.d("TAG_screen", "logInState değişti: data=${logInState.data}, message=${logInState.message}")
         when {
             logInState.data != null -> {
                 Toast.makeText(context, logInState.data, Toast.LENGTH_LONG).show()
                 navController.navigate(AppScreens.ChatListScreen.name) {
                     popUpTo(AppScreens.LoginScreen.name) { inclusive = true }
                 }
-                logInViewModel.clearMessage()
+                logInViewModel.clearState()
             }
             logInState.message != null -> {
                 formError = logInState.message
-                logInViewModel.clearMessage()
             }
         }
     }
@@ -75,35 +71,31 @@ fun LogInScreen(
             ) {
                 OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it; if (formError != null) formError = null },
+                    onValueChange = { email = it; formError = null },
                     label = { Text("E-posta") },
-                    modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
                     isError = formError != null && email.isBlank()
                 )
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it; if (formError != null) formError = null },
+                    onValueChange = { password = it; formError = null },
                     label = { Text("Şifre") },
-                    modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
                     visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.padding(top = 12.dp).fillMaxWidth(),
                     isError = formError != null && password.isBlank()
                 )
                 formError?.let {
-                    Text(
-                        text = it,
-                        color = Color.Red,
-                        modifier = Modifier.padding(top = 12.dp)
-                    )
+                    Text(text = it, color = Color.Red, modifier = Modifier.padding(top = 12.dp))
                 }
                 Button(
                     onClick = {
                         formError = when {
                             email.isBlank() || password.isBlank() -> "Tüm alanları doldurun!"
-                            !email.contains("@") || !email.contains(".") -> "Geçerli bir e-posta adresi girin!"
+                            !email.contains("@") || !email.contains(".") -> "Geçerli bir e-posta girin!"
                             else -> {
                                 logInViewModel.logIn(email, password)
-                                null // Navigasyonu LaunchedEffect'e bırakıyoruz
+                                null
                             }
                         }
                     },
@@ -119,7 +111,6 @@ fun LogInScreen(
                     Text("Hesabın yok mu? Kayıt Ol")
                 }
                 if (logInState.isLoading) {
-                    Log.d("TAG", "logInState.isLoading: ${logInState.isLoading}")
                     CircularProgressIndicator(modifier = Modifier.padding(top = 12.dp))
                 }
             }

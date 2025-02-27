@@ -19,7 +19,7 @@ android {
 
     defaultConfig {
         applicationId = "com.mehmetbaloglu.mychatapp"
-        minSdk = 34
+        minSdk = 28
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"

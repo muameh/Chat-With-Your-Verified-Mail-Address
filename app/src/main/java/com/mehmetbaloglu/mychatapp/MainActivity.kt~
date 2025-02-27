@@ -28,17 +28,22 @@ class MainActivity : ComponentActivity() {
                 val auth = FirebaseAuth.getInstance()
                 var currentUser by remember { mutableStateOf(auth.currentUser) }
 
+                // Firebase Auth durumunu izle
                 LaunchedEffect(Unit) {
                     auth.addAuthStateListener { firebaseAuth ->
                         currentUser = firebaseAuth.currentUser
-                        if (currentUser != null && currentUser!!.isEmailVerified) {
-                            navController.navigate(AppScreens.ChatListScreen.name) {
-                                popUpTo(AppScreens.LoginScreen.name) { inclusive = true }
-                            }
-                        } else {
-                            navController.navigate(AppScreens.LoginScreen.name) {
-                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                            }
+                    }
+                }
+
+                // Oturum durumuna göre navigasyon
+                LaunchedEffect(currentUser) {
+                    if (currentUser != null) {
+                        navController.navigate(AppScreens.ChatListScreen.name) {
+                            popUpTo(AppScreens.LoginScreen.name) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate(AppScreens.LoginScreen.name) {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
                         }
                     }
                 }

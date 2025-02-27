@@ -13,7 +13,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LogInViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
-
     private val _logInState = MutableStateFlow<Resource<String>>(Resource())
     val logInState: StateFlow<Resource<String>> = _logInState
 
@@ -21,12 +20,11 @@ class LogInViewModel @Inject constructor(private val repository: Repository) : V
         viewModelScope.launch {
             repository.logIn(email, password).collect { result ->
                 _logInState.value = result
-                Log.d("TAG_viewmodel_logInState", "logIn: ${result.message ?: result.data}")
             }
         }
     }
 
-    fun clearMessage() {
-        _logInState.value = _logInState.value.copy(message = null)
+    fun clearState() {
+        _logInState.value = Resource()
     }
 }

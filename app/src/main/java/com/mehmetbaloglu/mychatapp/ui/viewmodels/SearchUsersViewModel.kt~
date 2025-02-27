@@ -34,6 +34,7 @@ class SearchUsersViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             _searchState.value = SearchState(isLoading = true)
             try {
+                // Firebase Authentication'da e-posta ile kullanıcı bulma (doğrudan UID alamıyoruz, veritabanını kullanıyoruz)
                 database.reference.child("users")
                     .orderByChild("email")
                     .equalTo(email)
@@ -42,14 +43,18 @@ class SearchUsersViewModel @Inject constructor() : ViewModel() {
                             if (snapshot.exists()) {
                                 for (child in snapshot.children) {
                                     val userId = child.key
-                                    val userName = child.child("userName").getValue(String::class.java)
+                                    val userName =
+                                        child.child("userName").getValue(String::class.java)
                                     if (userId != null && userName != null) {
                                         _searchState.value = SearchState(
                                             isLoading = false,
                                             userId = userId,
                                             userName = userName
                                         )
-                                        Log.d("xxSearchUsersViewModel", "User found: $userId, $userName")
+                                        Log.d(
+                                            "xxSearchUsersViewModel",
+                                            "User found: $userId, $userName"
+                                        )
                                         return
                                     }
                                 }
@@ -85,78 +90,6 @@ class SearchUsersViewModel @Inject constructor() : ViewModel() {
             try {
                 val senderId = auth.currentUser?.uid
                     ?: throw IllegalStateException("Kullanıcı oturumu açık değil")
-
-                // Kendine istek atma kontrolü
-                if (senderId == receiverId) {
-                    _searchState.value = SearchState(
-                        isLoading = false,
-                        userId = receiverId,
-                        userName = _searchState.value.userName,
-                        message = "Kendinize arkadaşlık isteği gönderemezsiniz!"
-                    )
-                    Log.d("xxSearchUsersViewModel", "Cannot send friend request to self: $senderId")
-                    return@launch
-                }
-
-                // Zaten arkadaşlık durumu kontrolü
-                database.reference.child("friendRequests").child(receiverId).child(senderId)
-                    .addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            if (snapshot.exists()) {
-                                val status = snapshot.child("status").getValue(String::class.java)
-                                when (status) {
-                                    "accepted" -> {
-                                        _searchState.value = SearchState(
-                                            isLoading = false,
-                                            userId = receiverId,
-                                            userName = _searchState.value.userName,
-                                            message = "Zaten arkadaşsınız!"
-                                        )
-                                        Log.d("xxSearchUsersViewModel", "Already friends with $receiverId")
-                                    }
-                                    "pending" -> {
-                                        _searchState.value = SearchState(
-                                            isLoading = false,
-                                            userId = receiverId,
-                                            userName = _searchState.value.userName,
-                                            message = "Bu kişiye zaten bir istek gönderilmiş!"
-                                        )
-                                        Log.d("xxSearchUsersViewModel", "Friend request already pending for $receiverId")
-                                    }
-                                    else -> {
-                                        sendNewFriendRequest(senderId, receiverId)
-                                    }
-                                }
-                            } else {
-                                sendNewFriendRequest(senderId, receiverId)
-                            }
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            _searchState.value = SearchState(
-                                isLoading = false,
-                                userId = receiverId,
-                                userName = _searchState.value.userName,
-                                message = "İstek durumu kontrol edilemedi: ${error.message}"
-                            )
-                            Log.e("xxSearchUsersViewModel", "Failed to check request status: ${error.message}")
-                        }
-                    })
-            } catch (e: Exception) {
-                _searchState.value = SearchState(
-                    isLoading = false,
-                    userId = receiverId,
-                    userName = _searchState.value.userName,
-                    message = "İstek gönderilemedi: ${e.localizedMessage}"
-                )
-                Log.e("xxSearchUsersViewModel", "Send friend request error: ${e.localizedMessage}")
-            }
-        }
-    }
-
-    private fun sendNewFriendRequest(senderId: String, receiverId: String) {
-        viewModelScope.launch {
-            try {
                 database.reference.child("friendRequests")
                     .child(receiverId)
                     .child(senderId)

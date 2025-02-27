@@ -68,9 +68,7 @@ fun ProfileScreen(
 
                 Button(
                     onClick = {
-                        navController.navigate(AppScreens.SearchOtherUsersScreen.name) {
-                            popUpTo(AppScreens.ChatListScreen.name) { inclusive = true }
-                        }
+                        navController.navigate(AppScreens.SearchOtherUsersScreen.name)
                     }, modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .padding(16.dp)
@@ -79,13 +77,20 @@ fun ProfileScreen(
                 Button(
                     onClick = {
                         viewModel.signOut()
-                        navController.navigate(AppScreens.LoginScreen.name) {
-                            popUpTo(AppScreens.ProfileScreen.name) { inclusive = true }
-                        }
+                        navController.navigate(AppScreens.LoginScreen.name)
                     },
                     modifier = Modifier.padding(bottom = 16.dp)
                 ) {
                     Text("Çıkış Yap")
+                }
+
+                Button(
+                    onClick = {
+                        navController.navigate(AppScreens.FriendRequestsDetailScreen.name)
+                    },
+                    modifier = Modifier.padding(bottom = 16.dp)
+                ) {
+                    Text("Arkadaşlık istekleri")
                 }
             }
         }

@@ -57,9 +57,8 @@ fun AppNavigation(
         composable(AppScreens.FriendsListScreen.name) {
             FriendsListScreen(navController = navController)
         }
-        composable("${AppScreens.FriendRequestsDetailScreen.name}/{requestId}") { backStackEntry ->
-            val requestId = backStackEntry.arguments?.getString("requestId") ?: ""
-            FriendRequestsDetailScreen(navController = navController, requestId = requestId)
+        composable(AppScreens.FriendRequestsDetailScreen.name) {
+            FriendRequestsDetailScreen(navController = navController)
         }
 
 
