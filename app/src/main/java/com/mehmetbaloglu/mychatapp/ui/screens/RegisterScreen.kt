@@ -135,7 +135,7 @@ fun RegisterScreen(
                             password != confirmPassword -> "Şifreler uyuşmuyor!"
                             password.length < 6 -> "Şifre en az 6 karakter olmalıdır!"
                             else -> {
-                                registerViewModel.registerUser(email, password)
+                                registerViewModel.registerUser(email, password,userName)
                                 null
                             }
                         }

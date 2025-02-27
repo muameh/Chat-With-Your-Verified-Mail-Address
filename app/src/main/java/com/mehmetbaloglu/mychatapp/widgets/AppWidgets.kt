@@ -1,5 +1,6 @@
 package com.mehmetbaloglu.mychatapp.widgets
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
@@ -16,31 +17,38 @@ import com.mehmetbaloglu.mychatapp.navigation.AppScreens
 object AppWidgets {
 
     @Composable
-    fun BottomNavigationBar(navController: NavHostController) {
+    fun BottomNavigationBar(navController: NavHostController, currentRoute: String) {
+        Log.d("xxBottomNavBar", "Rendering BottomNavigationBar, currentRoute: $currentRoute")
+
         NavigationBar {
             NavigationBarItem(
                 icon = { Icon(imageVector = Icons.Default.Home, contentDescription = "Home") },
                 label = { Text("Sohbetler") },
-                selected = navController.currentDestination?.route == AppScreens.ChatListScreen.name,
+                selected = currentRoute == AppScreens.ChatListScreen.name,
                 onClick = {
-                    navController.navigate(AppScreens.ChatListScreen.name) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
+                    if (currentRoute != AppScreens.ChatListScreen.name) {
+                        Log.d("xxBottomNavBar", "Navigating to ChatListScreen")
+                        navController.navigate(AppScreens.ChatListScreen.name) {
+                            popUpTo(AppScreens.ChatListScreen.name) { inclusive = false }
+                            launchSingleTop = true
+                        }
                     }
                 }
             )
             NavigationBarItem(
                 icon = { Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Profile") },
                 label = { Text("Profil") },
-                selected = navController.currentDestination?.route == AppScreens.ProfileScreen.name,
+                selected = currentRoute == AppScreens.ProfileScreen.name,
                 onClick = {
-                    navController.navigate(AppScreens.ProfileScreen.name) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
+                    if (currentRoute != AppScreens.ProfileScreen.name) {
+                        Log.d("xxBottomNavBar", "Navigating to ProfileScreen")
+                        navController.navigate(AppScreens.ProfileScreen.name) {
+                            popUpTo(AppScreens.ChatListScreen.name) { inclusive = false }
+                            launchSingleTop = true
+                        }
                     }
                 }
             )
         }
     }
-
 }

@@ -82,7 +82,7 @@ fun ChatListScreen(
                 }
             }
         }
-
+        
         Button(
             onClick = {
                 navController.navigate(AppScreens.ProfileScreen.name) {

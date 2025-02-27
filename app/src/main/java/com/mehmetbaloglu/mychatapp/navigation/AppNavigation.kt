@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.auth.FirebaseAuth
 import com.mehmetbaloglu.mychatapp.ui.screens.ChatListScreen
 import com.mehmetbaloglu.mychatapp.ui.screens.ChatScreen
 import com.mehmetbaloglu.mychatapp.ui.screens.FriendRequestsDetailScreen
@@ -20,8 +19,10 @@ import com.mehmetbaloglu.mychatapp.ui.screens.SettingsScreen
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
-    startDestination:String = AppScreens.LoginScreen.name) {
-    val navController: NavHostController = rememberNavController()
+    startDestination: String = AppScreens.LoginScreen.name,
+    navController: NavHostController = rememberNavController()
+) {
+
 
     NavHost(
         navController = navController,

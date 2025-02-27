@@ -18,9 +18,9 @@ class RegisterViewModel @Inject constructor(private val repository: Repository) 
     private val _registerState = MutableStateFlow<Resource<String>>(Resource())
     val registerState: StateFlow<Resource<String>> = _registerState
 
-    fun registerUser(email: String, password: String) {
+    fun registerUser(email: String, password: String, userName:String) {
         viewModelScope.launch {
-            repository.registerUser(email, password).collect { result ->
+            repository.registerUser(email, password, userName).collect { result ->
                 _registerState.value = result
                 Log.d("TAG_viewmodel_registerState", "registerUser: ${result.message}")
             }
@@ -39,7 +39,6 @@ class RegisterViewModel @Inject constructor(private val repository: Repository) 
     fun clearMessage() {
         _registerState.value = _registerState.value.copy(message = null)
     }
-
 
 
 }
