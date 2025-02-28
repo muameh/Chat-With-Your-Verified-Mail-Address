@@ -136,9 +136,9 @@ class Repository @Inject constructor() {
             }
             val user = authResult.user
             if (user != null) {
-                Log.d("xxRepository", "Giriş başarılı: uid=${user.uid}")
+                Log.d("xxRepository", "Kullanıcı var Mail doğrulaması kontrol ediliyor: uid=${user.uid}")
                 if (user.isEmailVerified) {
-                    emit(Resource(data = "Giriş başarılı!", isLoading = false))
+                    emit(Resource(data = "Hoşgeldiniz!", isLoading = false))
                 } else {
                     // Email doğrulanmamışsa logout yap ve hata mesajı döndür
                     auth.signOut()
@@ -149,12 +149,9 @@ class Repository @Inject constructor() {
                 Log.e("xxRepository", "Giriş başarısız, kullanıcı null!")
                 emit(Resource(message = "Giriş başarısız!", isLoading = false))
             }
-        } catch (e: TimeoutCancellationException) {
-            Log.e("xxRepository", "Zaman aşımı: Giriş işlemi başarısız")
-            emit(Resource(message = "Zaman aşımı: Giriş işlemi başarısız", isLoading = false))
         } catch (e: Exception) {
             Log.e("xxRepository", "Giriş hatası: ${e.localizedMessage}")
-            emit(Resource(message = "Giriş hatası: ${e.localizedMessage}", isLoading = false))
+            emit(Resource(message = e.localizedMessage, isLoading = false))
         }
     }.flowOn(Dispatchers.IO)
 }

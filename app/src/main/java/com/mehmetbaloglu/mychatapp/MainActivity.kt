@@ -26,7 +26,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         auth = FirebaseAuth.getInstance()
         enableEdgeToEdge()
-
         setContent {
             MyChatAppTheme {
                 val navController = rememberNavController()
@@ -45,11 +44,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             currentUser != null && !currentUser!!.isEmailVerified -> {
-                                Log.d("xxMainActivity", "Email doğrulanmamış, logout yapılıyor")
-                                auth.signOut()
-                                navController.navigate(AppScreens.LoginScreen.name) {
-                                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                                }
+                                Log.d("xxMainActivity", "Email doğrulanmamış, bekleniyor...")
                             }
                             else -> {
                                 Log.d("xxMainActivity", "Kullanıcı giriş yapmamış, LoginScreen'e gidiliyor")
@@ -59,6 +54,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
+
                     auth.addAuthStateListener(authListener)
                     onDispose {
                         auth.removeAuthStateListener(authListener)
