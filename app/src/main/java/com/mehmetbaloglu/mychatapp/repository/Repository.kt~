@@ -139,12 +139,8 @@ class Repository @Inject constructor() {
                 Log.d("xxRepository", "Giriş başarılı: uid=${user.uid}")
                 if (user.isEmailVerified) {
                     emit(Resource(data = "Giriş başarılı!", isLoading = false))
-                } else {
-                    // Email doğrulanmamışsa logout yap ve hata mesajı döndür
-                    auth.signOut()
-                    Log.d("xxRepository", "Email doğrulanmamış: uid=${user.uid}")
-                    emit(Resource(message = "Lütfen önce email adresinizi doğrulayın!", isLoading = false))
                 }
+                
             } else {
                 Log.e("xxRepository", "Giriş başarısız, kullanıcı null!")
                 emit(Resource(message = "Giriş başarısız!", isLoading = false))

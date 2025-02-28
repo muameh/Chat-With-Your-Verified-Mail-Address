@@ -20,9 +20,9 @@ import com.mehmetbaloglu.mychatapp.ui.viewmodels.ProfileViewModel
 
 @Composable
 fun ProfileScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val viewModel: ProfileViewModel = hiltViewModel()
     val profileState by viewModel.profileState.collectAsState()
 
     Column(

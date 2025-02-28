@@ -1,9 +1,11 @@
 package com.mehmetbaloglu.mychatapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,33 +20,61 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = FirebaseAuth.getInstance()
         enableEdgeToEdge()
 
         setContent {
             MyChatAppTheme {
                 val navController = rememberNavController()
-                val auth = FirebaseAuth.getInstance()
                 var currentUser by remember { mutableStateOf(auth.currentUser) }
 
-                LaunchedEffect(Unit) {
-                    auth.addAuthStateListener { firebaseAuth ->
+                // Auth state listener'ı DisposableEffect ile yönetiyoruz
+                DisposableEffect(Unit) {
+                    val authListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
                         currentUser = firebaseAuth.currentUser
-                        if (currentUser != null && currentUser!!.isEmailVerified) {
-                            navController.navigate(AppScreens.ChatListScreen.name) {
-                                popUpTo(AppScreens.LoginScreen.name) { inclusive = true }
+                        Log.d("xxMainActivity", "Auth state değişti: currentUser=${currentUser?.uid}, isEmailVerified=${currentUser?.isEmailVerified}")
+                        when {
+                            currentUser != null && currentUser!!.isEmailVerified -> {
+                                Log.d("xxMainActivity", "Email doğrulanmış, ChatListScreen'e gidiliyor")
+                                navController.navigate(AppScreens.ChatListScreen.name) {
+                                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                }
                             }
-                        } else {
-                            navController.navigate(AppScreens.LoginScreen.name) {
-                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                            currentUser != null && !currentUser!!.isEmailVerified -> {
+                                Log.d("xxMainActivity", "Email doğrulanmamış, logout yapılıyor")
+                                auth.signOut()
+                                navController.navigate(AppScreens.LoginScreen.name) {
+                                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                }
+                            }
+                            else -> {
+                                Log.d("xxMainActivity", "Kullanıcı giriş yapmamış, LoginScreen'e gidiliyor")
+                                navController.navigate(AppScreens.LoginScreen.name) {
+                                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                }
                             }
                         }
                     }
+                    auth.addAuthStateListener(authListener)
+                    onDispose {
+                        auth.removeAuthStateListener(authListener)
+                        Log.d("xxMainActivity", "Auth listener temizlendi")
+                    }
+                }
+
+                // Başlangıç ekranı dinamik olarak belirleniyor
+                val startDestination = if (currentUser != null && currentUser!!.isEmailVerified) {
+                    AppScreens.ChatListScreen.name
+                } else {
+                    AppScreens.LoginScreen.name
                 }
 
                 AppNavigation(
-                    startDestination = AppScreens.LoginScreen.name,
+                    startDestination = startDestination,
                     navController = navController
                 )
             }

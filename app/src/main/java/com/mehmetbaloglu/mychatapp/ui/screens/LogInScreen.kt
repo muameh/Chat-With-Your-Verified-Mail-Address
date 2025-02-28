@@ -56,6 +56,8 @@ fun LogInScreen(navController: NavController) {
             }
             logInState.message != null -> {
                 formError = logInState.message
+                Toast.makeText(context, formError, Toast.LENGTH_LONG).show()
+                logInViewModel.clearState()
             }
         }
     }

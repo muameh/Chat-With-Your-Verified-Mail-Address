@@ -22,8 +22,6 @@ fun AppNavigation(
     startDestination: String = AppScreens.LoginScreen.name,
     navController: NavHostController = rememberNavController()
 ) {
-
-
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -32,15 +30,12 @@ fun AppNavigation(
         composable(AppScreens.RegisterScreen.name) {
             RegisterScreen(navController = navController)
         }
-
         composable(AppScreens.ChatListScreen.name) {
             ChatListScreen(navController = navController)
         }
-
         composable(AppScreens.LoginScreen.name) {
             LogInScreen(navController)
         }
-
         composable("${AppScreens.ChatScreen.name}/{friendId}") { backStackEntry ->
             val friendId = backStackEntry.arguments?.getString("friendId") ?: ""
             ChatScreen(navController = navController, friendId = friendId)
@@ -60,7 +55,5 @@ fun AppNavigation(
         composable(AppScreens.FriendRequestsDetailScreen.name) {
             FriendRequestsDetailScreen(navController = navController)
         }
-
-
     }
 }
