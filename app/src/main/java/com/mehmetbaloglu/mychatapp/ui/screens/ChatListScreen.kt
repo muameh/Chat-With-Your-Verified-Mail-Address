@@ -1,47 +1,29 @@
 package com.mehmetbaloglu.mychatapp.ui.screens
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.mehmetbaloglu.mychatapp.models.Conversation
-import com.mehmetbaloglu.mychatapp.models.Friend
 import com.mehmetbaloglu.mychatapp.navigation.AppScreens
 import com.mehmetbaloglu.mychatapp.ui.viewmodels.ChatListViewModel
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 @Composable
 fun ChatListScreen(
@@ -53,6 +35,8 @@ fun ChatListScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val homeState by viewModel.homeState.collectAsState()
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+    val context = LocalContext.current
+
     var showFriendsDialog by remember { mutableStateOf(false) }
 
     if (currentUserId == null) {
@@ -90,7 +74,6 @@ fun ChatListScreen(
                             .padding(top = 16.dp)
                     )
                 }
-
                 conversations.isEmpty() -> {
                     Text(
                         text = homeState.message ?: "Henüz sohbet yok.",
@@ -99,7 +82,6 @@ fun ChatListScreen(
                             .padding(top = 16.dp)
                     )
                 }
-
                 else -> {
                     LazyColumn(
                         modifier = Modifier.weight(1f)
@@ -117,44 +99,43 @@ fun ChatListScreen(
             }
 
             Button(
-                onClick = {
-                    navController.navigate(AppScreens.ProfileScreen.name)
-                },
+                onClick = { navController.navigate(AppScreens.ProfileScreen.name) },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(16.dp)
             ) {
                 Text("Profile")
             }
-        }
 
-        if (showFriendsDialog) {
-            AlertDialog(
-                onDismissRequest = { showFriendsDialog = false },
-                title = { Text("Arkadaşlarım") },
-                text = {
-                    if (friends.isEmpty()) {
-                        Text("Henüz arkadaşın yok.")
-                    } else {
-                        LazyColumn {
-                            items(friends) { friend ->
-                                FriendItem(
-                                    friend = friend,
-                                    onClick = {
-                                        navController.navigate("${AppScreens.ChatScreen.name}/${friend.userId}")
-                                        showFriendsDialog = false
-                                    }
-                                )
+            // Arkadaşlar Dialogu
+            if (showFriendsDialog) {
+                AlertDialog(
+                    onDismissRequest = { showFriendsDialog = false },
+                    title = { Text("Arkadaşlarım") },
+                    text = {
+                        if (friends.isEmpty()) {
+                            Text("Henüz arkadaşın yok.")
+                        } else {
+                            LazyColumn {
+                                items(friends) { friend ->
+                                    FriendItemforChatList(
+                                        friend = friend,
+                                        onClick = {
+                                            navController.navigate("${AppScreens.ChatScreen.name}/${friend.userId}")
+                                            showFriendsDialog = false
+                                        }
+                                    )
+                                }
                             }
                         }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showFriendsDialog = false }) {
+                            Text("Kapat")
+                        }
                     }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showFriendsDialog = false }) {
-                        Text("Kapat")
-                    }
-                }
-            )
+                )
+            }
         }
     }
 }
@@ -175,11 +156,12 @@ fun ConversationItem(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(
-                text = conversation.friendUserName
-                    ?: conversation.friendId, // Kullanıcı adını göster, yoksa UID
-                fontWeight = FontWeight.Bold
-            )
+            conversation.friendUserName?.let {
+                Text(
+                    text = it, // Burada friendId yerine kullanıcı adını göstermek daha iyi olabilir
+                    fontWeight = FontWeight.Bold
+                )
+            }
             Text(
                 text = conversation.lastMessage ?: "Mesaj yok",
                 style = MaterialTheme.typography.bodySmall
@@ -193,8 +175,8 @@ fun ConversationItem(
 }
 
 @Composable
-fun FriendItem(
-    friend: Friend,
+fun FriendItemforChatList(
+    friend: com.mehmetbaloglu.mychatapp.models.Friend,
     onClick: () -> Unit
 ) {
     Card(

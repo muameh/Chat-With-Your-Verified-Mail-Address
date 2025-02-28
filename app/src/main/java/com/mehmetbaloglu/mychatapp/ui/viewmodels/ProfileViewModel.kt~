@@ -178,23 +178,17 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
             _profileState.value = _profileState.value.copy(isLoading = true)
             try {
                 val userId = auth.currentUser?.uid ?: throw IllegalStateException("Kullanıcı oturumu açık değil")
-                // Çift taraflı arkadaşlık kaydını sil
+                // Çift taraflı silme
                 database.reference.child("friendRequests").child(userId).child(friendId)
                     .removeValue().await()
                 database.reference.child("friendRequests").child(friendId).child(userId)
                     .removeValue().await()
-
-                // İlgili sohbet kaydını sil
-                val conversationId = getConversationId(userId, friendId)
-                database.reference.child("conversations").child(conversationId)
-                    .removeValue().await()
-
                 _profileState.value = _profileState.value.copy(
                     message = "Arkadaşlıktan çıkarıldı!",
                     isLoading = false,
                     friends = _profileState.value.friends.filter { it.userId != friendId }
                 )
-                Log.d("xxProfileViewModel", "Friend removed: $friendId, conversation $conversationId deleted")
+                Log.d("xxProfileViewModel", "Friend removed: $friendId")
             } catch (e: Exception) {
                 _profileState.value = _profileState.value.copy(
                     message = "Arkadaşlıktan çıkarma başarısız: ${e.localizedMessage}",
